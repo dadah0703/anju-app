@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>오늘의 술안주 추천 테스트</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/BMJUA.woff.css">
+
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- 상단바 -->
+   <header class="topbar-wrap full-bleed">
+  <div class="topbar">
+    <div class="topbar__left">
+      <div class="brandmark">🍻</div>
+      <div class="brandtext">
+        <div class="brandtitle">오늘의 술안주 추천</div>
+        <div class="brandsub">STEP 선택형 테스트</div>
+      </div>
+    </div>
+
+    <div class="topbar__right">
+      <button id="btn-restart" class="btn btn--ghost" type="button">처음부터</button>
+    </div>
+  </div>
+</header>
+
+
+
+
+    <main class="main">
+
+      <!-- 로딩 -->
+      <section id="loading" class="card card--center">
+        <div class="loading">
+          <div class="spinner" aria-hidden="true"></div>
+          <div class="loading__text">
+            <div class="loading__title">DB 불러오는 중…</div>
+            <div class="muted">엑셀을 읽어 추천 시스템을 준비합니다.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 랜딩(방구석연구소 스타일: 대표 이미지 + 시작하기 + 참여자수 + 공유) -->
+    <section id="landing" class="card hidden">
+
+  <div class="hero">
+
+    <!-- ✅ 영상 영역: FULL WIDTH -->
+    <div class="hero__img hero__video full-bleed">
+      <video
+        src="./videos/hero.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+      ></video>
+      <div class="hero__overlay"></div>
+    </div>
+
+    <!-- ✅ 타이틀 이미지: 컨텐츠 영역(패딩 적용) -->
+    <div class="content">
+    
+      <p class="hero__desc muted">
+        16개의 질문을 선택하면, 엑셀 DB 기반으로 안주/페어링이 자동 추천됩니다.
+      </p>
+
+      <button id="btn-start" class="btn btn--primary btn--xl" type="button">
+        시작하기
+      </button>
+
+      <div class="stats">
+        <div class="stats__label muted">참여자 수</div>
+        <div id="participants" class="stats__value">0</div>
+      </div>
+
+      <div class="share">
+        <div class="share__title">테스트 공유하기</div>
+        <div class="share__btns">
+          <button class="chip" type="button" data-share="kakao">카카오</button>
+          <button class="chip" type="button" data-share="insta">인스타</button>
+          <button class="chip" type="button" data-share="twitter">트위터</button>
+          <button class="chip" type="button" data-share="link">링크복사</button>
+        </div>
+        <div id="share-toast" class="toast hidden">링크가 복사되었습니다.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+      <!-- 진행바 -->
+      <section id="progress-wrap" class="card hidden">
+        <div class="progress">
+          <div class="progress__row">
+            <div class="progress__left">
+              <div id="progress-step" class="progress__step">STEP 1</div>
+              <div id="progress-sub" class="progress__sub muted">총 16문항</div>
+            </div>
+            <div class="progress__right">
+              <div class="progress__bar">
+                <div id="progress-fill" class="progress__fill" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 질문 카드 -->
+      <section id="question-card" class="card hidden">
+        <div class="qhead">
+          <span id="q-part" class="badge">파트</span>
+          <span id="q-no" class="badge badge--soft">Q1</span>
+        </div>
+
+        <h2 id="q-title" class="qtitle">질문 텍스트</h2>
+
+        <div class="qmedia">
+          <img id="q-image" alt="질문 이미지" />
+        </div>
+
+        <div id="options" class="options"></div>
+
+        <div class="nav">
+          <button id="btn-prev" class="btn btn--ghost" type="button">이전</button>
+          <button id="btn-next" class="btn btn--primary" type="button" disabled>다음</button>
+        </div>
+      </section>
+
+      <!-- 결과 -->
+      <section id="result-card" class="card hidden">
+        <div class="result">
+          <div class="result__tag">RESULT</div>
+          <h2 id="result-type-title" class="result__title">오늘의 유형</h2>
+          <p id="result-type-subtitle" class="muted">유형 설명</p>
+
+          <div class="result__grid">
+            <div class="panel">
+              <h3 class="panel__title">추천 안주 5가지</h3>
+              <ul id="result-anju-list" class="list"></ul>
+            </div>
+            <div class="panel">
+              <h3 class="panel__title">최적의 술 페어링</h3>
+              <ul id="result-drink-list" class="list"></ul>
+            </div>
+          </div>
+
+          <div class="result__actions">
+            <button id="btn-again" class="btn btn--primary" type="button">다시 테스트</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 에러 -->
+      <section id="error" class="card hidden">
+        <h2 class="err__title">오류</h2>
+        <p id="error-msg" class="muted"></p>
+      </section>
+
+    </main>
+
+    <footer class="footer muted">
+      엑셀 DB 기반 추천 · SheetJS
+    </footer>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
